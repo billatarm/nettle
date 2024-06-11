@@ -1,3 +1,8 @@
+define(`PROLOGUE',
+`.globl C_NAME($1)
+DECLARE_FUNC(C_NAME($1))
+C_NAME($1): ASM_X86_ENDBR')
+
 C OFFSET(i)
 C Expands to 4*i, or to the empty string if i is zero
 define(`OFFSET', `ifelse($1,0,,eval(4*$1))')
