@@ -1078,7 +1078,47 @@ if test "$nettle_cv_asm_x86_gnu_property" = yes; then
 	.popsection'
 fi
 
+dnl  See: https://developer.arm.com/documentation/101028/0012/5--Feature-test-macros
+AC_COMPILE_IFELSE([
+  AC_LANG_PROGRAM([
+    #if !defined(__ARM_FEATURE_BTI_DEFAULT) && __ARM_FEATURE_BTI_DEFAULT != 1
+    #error "BTI is not enabled"
+    #endif
+  ])
+],
+[ASM_AARCH64_BTI_ENABLE=1],
+[])
+AC_COMPILE_IFELSE([
+  AC_LANG_PROGRAM([
+    #if !(defined(__ARM_FEATURE_PAC_DEFAULT)  && __ARM_FEATURE_PAC_DEFAULT & 1)
+    #error "PAC A Key not supported"
+    #endif
+  ])
+],
+[ASM_AARCH64_PAC_A_ENABLE=1],
+[])
+AC_COMPILE_IFELSE([
+  AC_LANG_PROGRAM([
+    #if !(defined(__ARM_FEATURE_PAC_DEFAULT)  && __ARM_FEATURE_PAC_DEFAULT & 2)
+    #error "PAC B Key not supported"
+    #endif
+  ])
+],
+[ASM_AARCH64_PAC_B_ENABLE=1],
+[])
+
+AC_COMPILE_IFELSE([
+  AC_LANG_PROGRAM([
+    #if !defined __ELF__
+    #error ELF not detected
+    #endif
+  ])
+],
+[ASM_IS_ELF=1],
+[ASM_IS_ELF=0])
+
 AC_SUBST(ASM_SYMBOL_PREFIX)
+AC_SUBST(ASM_IS_ELF)
 AC_SUBST(ASM_ELF_STYLE)
 AC_SUBST(ASM_COFF_STYLE)
 AC_SUBST(ASM_TYPE_FUNCTION)
@@ -1092,6 +1132,9 @@ AC_SUBST(EMULATOR)
 AC_SUBST(ASM_X86_ENDBR)
 AC_SUBST(ASM_X86_MARK_CET)
 AC_SUBST(ASM_X86_MARK_CET_ALIGN)
+AC_SUBST(ASM_AARCH64_BTI_ENABLE)
+AC_SUBST(ASM_AARCH64_PAC_A_ENABLE)
+AC_SUBST(ASM_AARCH64_PAC_B_ENABLE)
 
 AC_SUBST(LIBNETTLE_MAJOR)
 AC_SUBST(LIBNETTLE_MINOR)
